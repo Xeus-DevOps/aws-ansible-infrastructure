@@ -1,4 +1,4 @@
 variable "env" {
-  type = string
+  type        = string
   description = "Environment api gateway inside"
 }
