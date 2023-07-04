@@ -1,0 +1,77 @@
+---
+- name: Working Terraform from remote server
+  hosts: ansible-runner
+  remote_user: ubuntu
+  become: true
+  tasks:
+    - name: Terraform install
+      tags: install_terraform
+      block:
+        - name: Terraform Install Script
+          ansible.builtin.shell:
+            cmd: |
+              sudo apt update &&
+              sudo apt install -y git zip curl docker-compose &&
+              curl -L https://releases.hashicorp.com/terraform/1.5.2/terraform_1.5.2_linux_amd64.zip -o /tmp/terraform_1.5.2_linux_amd64.zip &&
+              unzip /tmp/terraform_1.5.2_linux_amd64.zip -d /tmp/ &&
+              sudo mv /tmp/terraform /usr/local/bin &&
+              terraform --version
+          register: shell_output
+          changed_when: false
+
+        - name: Display the output of Progress installing Terraform
+          ansible.builtin.debug:
+            msg: "{{ shell_output.stdout_lines }}"
+
+    - name: Copy Terraform folder
+      tags: copy_content
+      block:
+        - name: Copy Terraform folder into Remote
+          ansible.builtin.copy:
+            src: ../../terraform/
+            dest: /terraform
+            owner: ubuntu
+            group: ubuntu
+            mode: "0666"
+    - name: Init and Plan Terraform
+      tags: terraform_init_plan
+      block:
+        - name: Execute Terraform Init and Plan
+          ansible.builtin.shell:
+            cmd: |
+              terraform init --reconfigure &&
+              terraform plan
+            chdir: /terraform/env/staging
+          changed_when: false
+          register: shell_output
+        - name: Output terraform flow
+          ansible.builtin.debug:
+            msg: "{{ shell_output.stdout_lines }}"
+
+    - name: Apply Terraform
+      tags: terraform_apply
+      block:
+        - name: Execute Terraform Apply Command
+          ansible.builtin.shell:
+            cmd: |
+              terraform apply -auto-approve
+            chdir: /terraform/env/staging
+          changed_when: false
+          register: shell_output
+        - name: Output terraform flow
+          ansible.builtin.debug:
+            msg: "{{ shell_output.stdout_lines }}"
+
+    - name: Apply Terraform
+      tags: terraform_destroy
+      block:
+        - name: Execute Terraform Destroy Command
+          ansible.builtin.shell:
+            cmd: |
+              terraform destroy -auto-approve
+            chdir: /terraform/env/staging
+          changed_when: false
+          register: shell_output
+        - name: Output terraform flow
+          ansible.builtin.debug:
+            msg: "{{ shell_output.stdout_lines }}"
