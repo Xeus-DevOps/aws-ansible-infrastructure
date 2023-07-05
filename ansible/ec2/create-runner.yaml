@@ -47,6 +47,16 @@
                 rule_desc: "Allow SSH Port inside Ansible"
           register: result_sec_group
 
+        - name: IAM Role for work with AWS resource
+          community.aws.iam_role:
+            name: "{{ id }}-role"
+            assume_role_policy_document: "{{ lookup('file', './data/ansible-role-policies.json') }}"
+            managed_policies:
+              - arn:aws:iam::aws:policy/PowerUserAccess
+            create_instance_profile: true
+            purge_policies: true
+            state: present
+
         - name: Provision instance
           amazon.aws.ec2_instance:
             # aws_access_key: "{{ ec2_access_key }}"
@@ -55,14 +65,21 @@
             image_id: "{{ image }}"
             region: "{{ region }}"
             security_group: "{{ result_sec_group.group_id }}"
+            iam_instance_profile: "{{ id }}-role"
             instance_type: t2.micro
             tags:
               Name: "{{ id }}"
             wait: true
             count: 1
 
+        - name: Attact Instance Profile for IAM_ROLE
+          ansible.builtin.shell:
+            cmd: |
+              aws iam add-role-to-instance-profile --instance-profile-name {{ id }}-role --role-name {{ id }}-role
+          changed_when: false
+
     - name: View instance EC2 information
-      tags: "view_runner"
+      tags: "view-runner"
       block:
         - name: Get the information of EC2 runner
           amazon.aws.ec2_instance_info:

@@ -39,6 +39,8 @@
         - name: Execute Terraform Init and Plan
           ansible.builtin.shell:
             cmd: |
+              rm -rf .terraform &&
+              rm -rf .terraform.lock.hcl &&
               terraform init --reconfigure &&
               terraform plan
             chdir: /terraform/env/staging
@@ -62,7 +64,7 @@
           ansible.builtin.debug:
             msg: "{{ shell_output.stdout_lines }}"
 
-    - name: Apply Terraform
+    - name: Destroy Terraform
       tags: terraform_destroy
       block:
         - name: Execute Terraform Destroy Command
