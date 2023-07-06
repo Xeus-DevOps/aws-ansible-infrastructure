@@ -52,7 +52,7 @@
             name: "{{ id }}-role"
             assume_role_policy_document: "{{ lookup('file', './data/ansible-role-policies.json') }}"
             managed_policies:
-              - arn:aws:iam::aws:policy/PowerUserAccess
+              - arn:aws:iam::aws:policy/AdministratorAccess
             create_instance_profile: true
             purge_policies: true
             state: present
@@ -85,10 +85,20 @@
           amazon.aws.ec2_instance_info:
             filters:
               "tag:Name": "{{ id }}"
+              "instance-state-name": "running"
             region: "{{ region }}"
           register: runner_info
 
         - name: Display infomation of EC2 runner
           ansible.builtin.debug:
-            msg: "{{ item.instance_id }}"
+            msg: "{{ item.public_ip_address }}"
+          with_items: "{{ runner_info.instances }}"
+
+        - name: Output into inventory host of EC2 remote runner
+          ansible.builtin.copy:
+            content: |
+              [ansible-runner]
+              {{ item.public_ip_address }} ansible_user=ubuntu
+            dest: "../terraform-runner/inventory/hosts"
+            mode: "0666"
           with_items: "{{ runner_info.instances }}"

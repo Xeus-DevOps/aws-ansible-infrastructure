@@ -27,25 +27,27 @@
       tags: copy_content
       block:
         - name: Copy Terraform folder into Remote
-          ansible.builtin.copy:
+          ansible.posix.synchronize:
             src: ../../terraform/
             dest: /terraform
-            owner: ubuntu
-            group: ubuntu
-            mode: "0666"
+            rsync_opts:
+              - "--exclude=.terraform"
+              - "--exclude=.terraform.lock.hcl"
+              - "--exclude=terraform.tfstate"
+              - "--exclude=terraform.tfstate.backup"
+
     - name: Init and Plan Terraform
       tags: terraform_init_plan
       block:
         - name: Execute Terraform Init and Plan
           ansible.builtin.shell:
             cmd: |
-              rm -rf .terraform &&
-              rm -rf .terraform.lock.hcl &&
-              terraform init --reconfigure &&
+              terraform init &&
               terraform plan
-            chdir: /terraform/env/staging
+            chdir: /terraform/env/{{ env }}
           changed_when: false
           register: shell_output
+
         - name: Output terraform flow
           ansible.builtin.debug:
             msg: "{{ shell_output.stdout_lines }}"
@@ -57,9 +59,26 @@
           ansible.builtin.shell:
             cmd: |
               terraform apply -auto-approve
-            chdir: /terraform/env/staging
+            chdir: /terraform/env/{{ env }}
           changed_when: false
           register: shell_output
+
+        - name: Output terraform flow
+          ansible.builtin.debug:
+            msg: "{{ shell_output.stdout_lines }}"
+
+    - name: Init and Plan Destroy Terraform
+      tags: terraform_display_destroy
+      block:
+        - name: Execute Terraform Init and Plan
+          ansible.builtin.shell:
+            cmd: |
+              terraform init &&
+              terraform plan -destroy
+            chdir: /terraform/env/{{ env }}
+          changed_when: false
+          register: shell_output
+
         - name: Output terraform flow
           ansible.builtin.debug:
             msg: "{{ shell_output.stdout_lines }}"
@@ -71,9 +90,10 @@
           ansible.builtin.shell:
             cmd: |
               terraform destroy -auto-approve
-            chdir: /terraform/env/staging
+            chdir: /terraform/env/{{ env }}
           changed_when: false
           register: shell_output
+
         - name: Output terraform flow
           ansible.builtin.debug:
             msg: "{{ shell_output.stdout_lines }}"

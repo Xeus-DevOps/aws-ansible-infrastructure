@@ -9,3 +9,8 @@ variable "asg_id" {
 variable "tags" {
   description = "tags for EC2"
 }
+
+variable "vm_iam_instance_profile" {
+  type = string
+  description = "Name of IAM instance profile for EC2"
+}

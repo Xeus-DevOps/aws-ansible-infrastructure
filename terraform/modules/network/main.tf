@@ -34,7 +34,7 @@ resource "aws_route_table_association" "vmnet" {
 }
 
 resource "aws_security_group" "vmnet" {
-  name   = "vm-security-group"
+  name   = "${var.env}-vm"
   vpc_id = aws_vpc.vmnet.id
 
   ingress {
@@ -49,6 +49,14 @@ resource "aws_security_group" "vmnet" {
     description = "HTTP for VM"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS for VM"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

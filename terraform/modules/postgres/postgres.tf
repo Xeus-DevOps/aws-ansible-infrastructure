@@ -56,6 +56,7 @@ resource "aws_db_instance" "postgres_db_instance" {
 
   db_subnet_group_name   = aws_db_subnet_group.postgres.name
   vpc_security_group_ids = [ aws_security_group.postgres.id ]
+  enabled_cloudwatch_logs_exports = [ "postgresql", "upgrade" ]
   publicly_accessible    = false
   parameter_group_name   = aws_db_parameter_group.postgres_db_param.name
 

@@ -5,8 +5,8 @@ variable "tags" {
   })
   description = "Name of vm"
   default = {
-    Name = "Staging-EC2"
-    env  = "Staging"
+    Name = "staging-vm"
+    env  = "staging"
   }
 }
 
@@ -47,7 +47,7 @@ variable "location" {
 }
 
 variable "postgres_username" {
-  type = string
+  type        = string
   description = "Username for login DB postgres"
-  default = "postgres14user"
+  default     = "postgres14user"
 }

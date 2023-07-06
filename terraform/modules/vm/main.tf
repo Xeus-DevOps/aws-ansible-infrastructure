@@ -12,7 +12,9 @@ resource "aws_instance" "main" {
   instance_type   = "t2.micro"
   subnet_id       = var.subnet_id
   key_name        = aws_key_pair.main.key_name
-  security_groups = [var.asg_id]
+  vpc_security_group_ids = [ var.asg_id ]
+  iam_instance_profile = var.vm_iam_instance_profile
+  monitoring = true
 
   ebs_block_device {
     volume_size = "8"

@@ -1,5 +1,11 @@
 module "network" {
   source = "../../modules/network"
+  env    = var.env
+}
+
+module "iam" {
+  source = "../../modules/iam"
+  env = var.env
 }
 
 module "ec2" {
@@ -7,8 +13,9 @@ module "ec2" {
   subnet_id = module.network.subnet_id
   asg_id    = module.network.asg_id
   tags      = var.tags
+  vm_iam_instance_profile = module.iam.vm_iam_instance_profile
   depends_on = [
-    module.network
+    module.network, module.iam
   ]
 }
 
@@ -45,8 +52,9 @@ module "cloudwatch" {
   source             = "../../modules/cloudwatch"
   env                = var.env
   bucket_domain_name = module.bucket.bucket_domain_name
+  vm_instance_id     = module.ec2.vm_instance_id
   location           = var.location
   depends_on = [
-    module.bucket
+    module.bucket, module.ec2
   ]
 }
