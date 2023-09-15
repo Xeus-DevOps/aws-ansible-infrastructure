@@ -74,9 +74,8 @@
 ## Idea of that work
 <div align="center">
     <img src="https://miro.medium.com/v2/resize:fit:1092/1*x4TscxA6uaN3asAreNg6yw.png">
+    <strong><em><p style="text-align: center;">Source: [One-click environment creation with Terraform & Ansible in under 10' - On The Cloud Kostas Gkountakos](https://medium.com/on-the-cloud/one-click-environment-creation-with-terraform-ansible-in-under-10-6e8d9284f60)</p></em></strong>
 </div>
-
-***<p style="text-align: center;">Source: [One-click environment creation with Terraform & Ansible in under 10' - On The Cloud Kostas Gkountakos](https://medium.com/on-the-cloud/one-click-environment-creation-with-terraform-ansible-in-under-10-6e8d9284f60)</p>***
 
 - Ansible have role like 3th party tools, it will do twice job:
     1. Provisioning itself, ansible-runner in AWS Cloud and you can connect it directly with Authentication SSH Key. Ideally, When you doing that job you will control and plan for setting up your Pipeline CI/CD easier than do it with Terraform.
@@ -123,7 +122,12 @@
             3. terraform destroy -auto-approve
         ```
 3. Script to automation run (**on development process**)
-    
+
+## Infra on the first sight after provisioning
+<div align="center">
+    <img src="./design/MicrosoftTeams-image.png">
+    <strong><em><p style="text-align: center;">Completed Infrastructure After Provisioning AWS</p></em></strong>
+</div>
 
 
 
